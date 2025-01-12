@@ -24,7 +24,7 @@ public class UserRegistrationController {
         return null;
     }
 
-    @PostMapping("/token")
+    @PostMapping("/generateToken")
     public String token(@RequestBody VectorRegisteredUser vectorRegisteredUser){
         try {
             //validating userName  by using authentication Manager....

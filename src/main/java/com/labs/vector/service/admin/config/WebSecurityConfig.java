@@ -1,6 +1,8 @@
 package com.labs.vector.service.admin.config;
 
+import com.labs.vector.service.admin.service.impl.JwtAuthApiGatewayFilter;
 import com.labs.vector.service.admin.service.impl.UserDetailsServiceImp;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,9 +15,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class WebSecurityConfig {
+
+    @Autowired
+    private JwtAuthApiGatewayFilter jwtAuthApiGatewayFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -24,7 +30,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request-> request
                         .requestMatchers("/createUser","/api/*").permitAll()
                         .anyRequest()
-                        .authenticated())
+                        .authenticated()
+                )
+                .addFilterBefore(jwtAuthApiGatewayFilter, UsernamePasswordAuthenticationFilter.class)  //Implemented Interceptor..
                 .build();
     }
 
