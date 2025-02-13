@@ -14,7 +14,7 @@ public class RegionMaster {
     private int regionID;
 
     @Column(name = "city_ID")
-    private int cityID;
+    private Integer cityID;
 
     @Column(name = "city_Name")
     private String cityName;

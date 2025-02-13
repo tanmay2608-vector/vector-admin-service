@@ -13,6 +13,4 @@ public interface VectorRegisteredUserRepository extends JpaRepository<VectorRegi
     Optional<VectorRegisteredUser> findByUserName(String userName);
 
     Optional<VectorRegisteredUser> findByUserNameAndPassword(String userName, String password);
-
-    Optional<List<Object>> findAllUser();
 }

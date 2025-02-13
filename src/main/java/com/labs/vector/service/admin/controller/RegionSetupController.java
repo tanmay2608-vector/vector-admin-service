@@ -1,6 +1,5 @@
 package com.labs.vector.service.admin.controller;
 
-import com.labs.vector.service.admin.dto.request.CreateCityRequest;
 import com.labs.vector.service.admin.dto.request.CreateRegionRequest;
 import com.labs.vector.service.admin.service.RegionSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
