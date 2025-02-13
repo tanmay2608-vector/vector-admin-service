@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>vector-service-admin</name>
 	<description>Admin project for vectorlab </description>
+	<packaging>war</packaging> <!-- Change from jar to war -->
 	<url/>
 	<licenses>
 		<license/>
@@ -108,6 +109,11 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.4.0</version>
 			</plugin>
 		</plugins>
 	</build>
