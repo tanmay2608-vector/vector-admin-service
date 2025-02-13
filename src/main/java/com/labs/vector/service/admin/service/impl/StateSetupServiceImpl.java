@@ -26,7 +26,7 @@ public class StateSetupServiceImpl implements StateSetupService {
         try{
             //checking state already exits for respective country...
             if(createStateRequest.getStateID() == 0) {
-                Optional<StateMaster> stateMaster = stateMasterRepository.findByStateNameAndCountryID(createStateRequest.getCountryID(), createStateRequest.getStateName());
+                Optional<StateMaster> stateMaster = stateMasterRepository.findByStateNameAndCountryID(createStateRequest.getStateName(), createStateRequest.getCountryID());
                 if (stateMaster.isPresent()) {
                     ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,

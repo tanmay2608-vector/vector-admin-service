@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface RegionMasterRepository extends JpaRepository<RegionMaster, Integer> {
 
-    Optional<RegionMaster> findByRegionNameAndCityID(Integer cityID, String regionName);
+    Optional<RegionMaster> findByRegionNameAndCityID(String regionName, Integer cityID);
 
     Optional<RegionMaster> findByIsDefault(String isDefault);
 

@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface StateMasterRepository extends JpaRepository<StateMaster, Integer> {
 
-    Optional<StateMaster> findByStateNameAndCountryID(Integer countryID, String stateName);
+    Optional<StateMaster> findByStateNameAndCountryID(String stateName, Integer countryID);
 
     Optional<StateMaster> findByIsDefault(String isDefault);
 

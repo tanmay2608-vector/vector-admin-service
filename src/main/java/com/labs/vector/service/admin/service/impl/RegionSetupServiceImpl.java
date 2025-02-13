@@ -10,10 +10,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class RegionSetupServiceImpl implements RegionSetupService {
 
     @Autowired
@@ -24,7 +26,7 @@ public class RegionSetupServiceImpl implements RegionSetupService {
        try{
             //checking region already exits for respective city...
             if(createRegionRequest.getRegionID() == 0) {
-                Optional<RegionMaster> regionMaster = regionMasterRepository.findByRegionNameAndCityID(createRegionRequest.getCityID(), createRegionRequest.getRegionName());
+                Optional<RegionMaster> regionMaster = regionMasterRepository.findByRegionNameAndCityID(createRegionRequest.getRegionName(),createRegionRequest.getCityID());
                 if (regionMaster.isPresent()) {
                     ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
