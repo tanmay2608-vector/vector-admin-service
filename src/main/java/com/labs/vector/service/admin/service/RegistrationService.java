@@ -8,4 +8,7 @@ public interface RegistrationService {
 
     public ResponseEntity<?> createVectorUser(CreateUserRequest createUserRequest);
     public ResponseEntity<?> getLoggedUser(CreateUserRequest loggedUserDetails);
+    public ResponseEntity<?> getRegisteredVectorUsers(Integer userID);
+    public ResponseEntity<?> getVectorAdminUserByID(Integer userID);
+    public ResponseEntity<?> getVectorUserByID(Integer userID);
 }
