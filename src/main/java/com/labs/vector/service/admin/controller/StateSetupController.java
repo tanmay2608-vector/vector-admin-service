@@ -21,6 +21,7 @@ public class StateSetupController {
     @Autowired
     StateSetupService stateSetupService;
 
+    /*------------------------------------------   Create And Update State  --------------------------------------------*/
     @PostMapping("/createUpdateState")
     public ResponseEntity<?> createUpdateState(@Valid @RequestBody CreateStateRequest createStateRequest, BindingResult result){
         if(result.hasErrors()){
@@ -34,16 +35,19 @@ public class StateSetupController {
         return stateSetupService.createUpdateState(createStateRequest);
     }
 
-    @GetMapping("/getAllStates")
-    public ResponseEntity<?> getAllStates(){
-        return stateSetupService.getAllStates();
-    }
-
+    /*------------------------------------------   Load states based on country  --------------------------------------------*/
     @GetMapping("/getStates/{countryID}")
     public ResponseEntity<?> getStatesByCountryID(@PathVariable Integer countryID){
         return stateSetupService.getAllStatesByCountryID(countryID);
     }
 
+    /*------------------------------------------   Load Cities and Country based on state  --------------------------------------------*/
+    @GetMapping("/{stateId}/cities-districts")
+    public ResponseEntity<?> getCitiesAndDistrictByStateID(@PathVariable Integer stateID){
+        return stateSetupService.getCitiesAndDistrictByStateID(stateID);
+    }
+
+    /*------------------------------------------ Delete state --------------------------------------------*/
     @DeleteMapping("/deleteState/{stateID}")
     public ResponseEntity<?> deleteStates(@PathVariable Integer stateID){
         return stateSetupService.deleteState(stateID);

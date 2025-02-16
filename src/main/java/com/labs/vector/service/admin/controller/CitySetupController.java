@@ -22,8 +22,9 @@ public class CitySetupController {
     @Autowired
     CitySetupService citySetupService;
 
+    /*------------------------------------------   Create And Update City  --------------------------------------------*/
     @PostMapping("/createUpdateCity")
-    public ResponseEntity<?> createUodateCity(@Valid @RequestBody CreateCityRequest createCityRequest, BindingResult result){
+    public ResponseEntity<?> createUpdateCity(@Valid @RequestBody CreateCityRequest createCityRequest, BindingResult result){
         if(result.hasErrors()){
             ResponseUtil.createErrorResponse(
                     HttpStatus.BAD_REQUEST,
@@ -35,15 +36,7 @@ public class CitySetupController {
         return citySetupService.createUpdateCity(createCityRequest);
     }
 
-    @GetMapping("/getAllCities")
-    public ResponseEntity<?> getAllCities(){
-        return citySetupService.getAllCity();
-    }
-
-    @GetMapping("/getCities/{stateID}")
-    public ResponseEntity<?> getStatesByCountryID(@PathVariable Integer stateID){
-        return citySetupService.getAllCityByStateID(stateID);
-    }
+    /*------------------------------------------   Delete Cities  --------------------------------------------*/
 
     @DeleteMapping("/deleteCity/{cityID}")
     public ResponseEntity<?> deleteCity(@PathVariable Integer cityID){

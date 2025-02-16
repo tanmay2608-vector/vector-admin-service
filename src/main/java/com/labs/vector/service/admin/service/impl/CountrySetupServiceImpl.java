@@ -5,6 +5,7 @@ import com.labs.vector.service.admin.dto.response.ListOfCountryResponse;
 import com.labs.vector.service.admin.model.CountryMaster;
 import com.labs.vector.service.admin.repository.CountryMasterRepository;
 import com.labs.vector.service.admin.service.CountrySetupService;
+import com.labs.vector.service.admin.service.StateSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class CountrySetupServiceImpl implements CountrySetupService {
 
     @Autowired
     CountryMasterRepository countryMasterRepository;
+
+    @Autowired
+    StateSetupService stateSetupService;
 
     @Override
     public ResponseEntity<?> createUpdateCountry(CreateCountryRequest createCountryRequest) {
@@ -89,7 +93,10 @@ public class CountrySetupServiceImpl implements CountrySetupService {
         try {
             Optional<CountryMaster> existingCountry = countryMasterRepository.findById(countryID);
             if(existingCountry.isPresent() && existingCountry.get() != null){
-                countryMasterRepository.delete(existingCountry.get());
+                //Deleting states for respective country..
+                stateSetupService.deleteStatesByCountryID(countryID);
+
+                countryMasterRepository.deleteById(countryID);
                 return ResponseEntity.ok("Country has been deleted successfully!");
             }
         } catch (Exception e) {

@@ -21,6 +21,7 @@ public class CountrySetupController {
     @Autowired
     CountrySetupService countrySetupService;
 
+    /*------------------------------------------   Create And Update Country  --------------------------------------------*/
     @PostMapping("createUpdateContry")
     public ResponseEntity<?> createUpdateContry(@Valid @RequestBody CreateCountryRequest createCountryRequest, BindingResult result){
         if(result.hasErrors()){
@@ -31,15 +32,16 @@ public class CountrySetupController {
                     "Please correct the input fields as per the validation rules."
             );
         }
-
         return countrySetupService.createUpdateCountry(createCountryRequest);
     }
 
+    /*------------------------------------------   Load Country  --------------------------------------------*/
     @GetMapping("getAllCountries")
     public ResponseEntity<?> getAllCountries(){
         return countrySetupService.getAllCountry();
     }
 
+    /*------------------------------------------ Delete Country --------------------------------------------*/
     @DeleteMapping("deleteCountry/{countryID}")
     public ResponseEntity<?> deleteCountry(@PathVariable Integer countryID){
         return countrySetupService.deleteCountry(countryID);

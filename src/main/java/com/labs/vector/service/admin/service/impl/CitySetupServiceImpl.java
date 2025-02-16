@@ -1,12 +1,11 @@
 package com.labs.vector.service.admin.service.impl;
 
 import com.labs.vector.service.admin.dto.request.CreateCityRequest;
-import com.labs.vector.service.admin.dto.response.ListOfCityResponse;
-import com.labs.vector.service.admin.dto.response.ListOfStateResponse;
+import com.labs.vector.service.admin.dto.response.ListOfCityDistrictResponse;
 import com.labs.vector.service.admin.model.CityMaster;
-import com.labs.vector.service.admin.model.StateMaster;
 import com.labs.vector.service.admin.repository.CityMasterRepository;
 import com.labs.vector.service.admin.service.CitySetupService;
+import com.labs.vector.service.admin.service.RegionSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,9 @@ public class CitySetupServiceImpl implements CitySetupService{
 
     @Autowired
     CityMasterRepository cityMasterRepository;
+
+    @Autowired
+    RegionSetupService regionSetupService;
 
     @Override
     public ResponseEntity<?> createUpdateCity(CreateCityRequest createCityRequest) {
@@ -78,7 +80,7 @@ public class CitySetupServiceImpl implements CitySetupService{
         try {
             List<CityMaster> cityMasterList = cityMasterRepository.findAll();
             if(cityMasterList != null && !cityMasterList.isEmpty()){
-                ListOfCityResponse listOfCityResponse = new ListOfCityResponse();
+                ListOfCityDistrictResponse listOfCityResponse = new ListOfCityDistrictResponse();
                 listOfCityResponse.setCityMasters(cityMasterList);
                 return ResponseEntity.ok(listOfCityResponse);
             }
@@ -93,7 +95,9 @@ public class CitySetupServiceImpl implements CitySetupService{
         try {
             Optional<CityMaster> cityMaster = cityMasterRepository.findById(cityID);
             if(cityMaster.isPresent()){
-                cityMasterRepository.delete(cityMaster.get());
+                //Deleting region for respective city...
+                regionSetupService.deleteAllRegionByCityID(cityID);
+                cityMasterRepository.deleteById(cityID);
                 ResponseEntity.ok("City has been deleted successfully!");
             }
         } catch (Exception e) {
@@ -103,13 +107,19 @@ public class CitySetupServiceImpl implements CitySetupService{
     }
 
     @Override
-    public ResponseEntity<?> getAllCityByStateID(Integer stateID) {
+    public List<CityMaster> getAllCityByStateID(Integer stateID) {
+        return cityMasterRepository.findByStateID(stateID);
+    }
+
+    @Override
+    public String deleteCityByStateID(Integer stateID) {
         try {
             List<CityMaster> cityMasterList  = cityMasterRepository.findByStateID(stateID);
             if(cityMasterList != null && cityMasterList.size() > 0){
-                ListOfCityResponse listOfCityResponse = new ListOfCityResponse();
-                listOfCityResponse.setCityMasters(cityMasterList);
-                return ResponseEntity.ok(listOfCityResponse);
+                for(CityMaster city : cityMasterList){
+                    deleteAllCityForState(city.getCityID());
+                }
+                return "SUCCESS";
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,4 +127,15 @@ public class CitySetupServiceImpl implements CitySetupService{
         return null;
     }
 
+    private void deleteAllCityForState(Integer cityID){
+        try {
+            if(cityID > 0){
+                //Deleting region for respective cityID...
+                regionSetupService.deleteAllRegionByCityID(cityID);
+                cityMasterRepository.deleteById(cityID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

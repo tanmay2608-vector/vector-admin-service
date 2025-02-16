@@ -20,6 +20,7 @@ public class RegionSetupController {
     @Autowired
     RegionSetupService regionSetupService;
 
+    /*------------------------------------------   Create And Update Region  --------------------------------------------*/
     @PostMapping("/createUpdateRegion")
     public ResponseEntity<?> createUpdateRegion(@Valid @RequestBody CreateRegionRequest createRegionRequest, BindingResult result){
         if(result.hasErrors()){
@@ -33,16 +34,13 @@ public class RegionSetupController {
         return regionSetupService.createUpdateRegion(createRegionRequest);
     }
 
-    @GetMapping("/getAllRegion")
-    public ResponseEntity<?> getAllCities(){
-        return regionSetupService.getAllRegion();
-    }
-
+    /*------------------------------------------   Load Region By City ID  --------------------------------------------*/
     @GetMapping("/getRegions/{cityID}")
     public ResponseEntity<?> getRegionsByCityID(@PathVariable Integer cityID){
         return regionSetupService.getAllRegionByCityID(cityID);
     }
 
+    /*------------------------------------------  Delete Region  --------------------------------------------*/
     @DeleteMapping("/deleteRegion/{regionID}")
     public ResponseEntity<?> deleteRegion(@PathVariable Integer regionID){
         return regionSetupService.deleteRegion(regionID);

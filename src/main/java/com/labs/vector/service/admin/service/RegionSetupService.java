@@ -8,5 +8,5 @@ public interface RegionSetupService {
     ResponseEntity<?> getAllRegion();
     ResponseEntity<?> deleteRegion(Integer regionID);
     ResponseEntity<?> getAllRegionByCityID(Integer cityID);
-
+    String deleteAllRegionByCityID(Integer cityID);
 }

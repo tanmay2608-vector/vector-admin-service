@@ -1,9 +1,14 @@
 package com.labs.vector.service.admin.service.impl;
 
 import com.labs.vector.service.admin.dto.request.CreateStateRequest;
+import com.labs.vector.service.admin.dto.response.ListOfCityDistrictResponse;
 import com.labs.vector.service.admin.dto.response.ListOfStateResponse;
+import com.labs.vector.service.admin.model.CityMaster;
+import com.labs.vector.service.admin.model.DistrictMaster;
 import com.labs.vector.service.admin.model.StateMaster;
 import com.labs.vector.service.admin.repository.StateMasterRepository;
+import com.labs.vector.service.admin.service.CitySetupService;
+import com.labs.vector.service.admin.service.DistrictSetupService;
 import com.labs.vector.service.admin.service.StateSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +25,12 @@ public class StateSetupServiceImpl implements StateSetupService {
 
     @Autowired
     StateMasterRepository stateMasterRepository;
+
+    @Autowired
+    CitySetupService citySetupService;
+
+    @Autowired
+    DistrictSetupService districtSetupService;
 
     @Override
     public ResponseEntity<?> createUpdateState(CreateStateRequest createStateRequest) {
@@ -102,11 +113,61 @@ public class StateSetupServiceImpl implements StateSetupService {
     }
 
     @Override
+    public ResponseEntity<?> getCitiesAndDistrictByStateID(Integer stateID) {
+        try {
+            if(stateID != null && stateID > 0) {
+                List<CityMaster> cityMasterList = citySetupService.getAllCityByStateID(stateID);
+                List<DistrictMaster> districtMasterList = districtSetupService.getAllDistrictByStateID(stateID);
+
+                ListOfCityDistrictResponse listOfCityDistrictResponse = new ListOfCityDistrictResponse();
+                listOfCityDistrictResponse.setCityMasters(cityMasterList);
+                listOfCityDistrictResponse.setDistrictMasterList(districtMasterList);
+
+                ResponseEntity.ok(listOfCityDistrictResponse);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String deleteStatesByCountryID(Integer countryID) {
+        try {
+            List<StateMaster> stateMasterList = stateMasterRepository.findByCountryID(countryID);
+            if(stateMasterList != null && stateMasterList.size() > 0){
+                for(StateMaster state : stateMasterList){
+                    deleteStateById(state.getStateID());
+                }
+                return "SUCCESS";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void deleteStateById(Integer stateID){
+        try {
+            if(stateID > 0){
+                //Deleting cities for respective state..
+                citySetupService.deleteCityByStateID(stateID);
+                stateMasterRepository.deleteById(stateID);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public ResponseEntity<?> deleteState(Integer stateID){
         try {
             Optional<StateMaster> stateMaster = stateMasterRepository.findById(stateID);
             if(stateMaster.isPresent()){
-                stateMasterRepository.delete(stateMaster.get());
+                //Deleting cities for respective state..
+                citySetupService.deleteCityByStateID(stateID);
+                districtSetupService.deleteDistrictByStateID(stateID);
+                stateMasterRepository.deleteById(stateID);
                 ResponseEntity.ok("State has been deleted successfully!");
             }
         } catch (Exception e) {

@@ -91,7 +91,7 @@ public class RegionSetupServiceImpl implements RegionSetupService {
         try {
             Optional<RegionMaster> regionMaster = regionMasterRepository.findById(regionID);
             if(regionMaster.isPresent()){
-                regionMasterRepository.delete(regionMaster.get());
+                regionMasterRepository.deleteById(regionID);
                 ResponseEntity.ok("Region has been deleted successfully!");
             }
         } catch (Exception e) {
@@ -109,6 +109,20 @@ public class RegionSetupServiceImpl implements RegionSetupService {
                 listOfRegionResponse.setRegionMasters(regionMasterList);
                 return ResponseEntity.ok(listOfRegionResponse);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String deleteAllRegionByCityID(Integer cityID) {
+        try{
+           List<RegionMaster> regionMasterList = regionMasterRepository.findByCityID(cityID);
+           if(regionMasterList != null && regionMasterList.size()>0){
+               regionMasterRepository.deleteAll(regionMasterList);
+               return "SUCCESS";
+           }
         } catch (Exception e) {
             e.printStackTrace();
         }

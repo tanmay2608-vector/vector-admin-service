@@ -9,4 +9,6 @@ public interface StateSetupService {
     ResponseEntity<?> getAllStates();
     ResponseEntity<?> deleteState(Integer stateID);
     ResponseEntity<?> getAllStatesByCountryID(Integer countryID);
+    ResponseEntity<?> getCitiesAndDistrictByStateID(Integer stateID);
+    String deleteStatesByCountryID(Integer countryID);
 }
