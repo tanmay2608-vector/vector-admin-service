@@ -57,11 +57,11 @@ public class InstitutionServiceImpl implements InstitutionService {
             school.setIsActive(createSchoolRequest.getIsActive());
 
             schoolRepository.save(school);
-            ResponseEntity.ok(school);
+           return ResponseEntity.ok(school);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & update school",e);
         }
-        return null;
     }
 
     @Override
@@ -72,11 +72,13 @@ public class InstitutionServiceImpl implements InstitutionService {
                 ListOfSchoolResponse listOfSchoolResponse = new ListOfSchoolResponse();
                 listOfSchoolResponse.setSchoolList(schoolList);
                 return ResponseEntity.ok(listOfSchoolResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"schools not found", "No schools exist ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all schools",e);
         }
-        return null;
     }
 
     @Override
@@ -85,12 +87,14 @@ public class InstitutionServiceImpl implements InstitutionService {
             Optional<School> schoolOptional = schoolRepository.findById(schoolId);
             if(schoolOptional.isPresent()){
                 schoolRepository.deleteById(schoolId);
-                ResponseEntity.ok("School has been deleted successfully!");
+                return ResponseEntity.ok("School has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"School not found", "Invalid school Id : "+schoolId,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete schools",e);
         }
-        return null;
     }
 
     @Override
@@ -124,8 +128,8 @@ public class InstitutionServiceImpl implements InstitutionService {
             return ResponseEntity.ok(university);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & Update University",e);
         }
-        return null;
     }
 
     @Override
@@ -136,11 +140,13 @@ public class InstitutionServiceImpl implements InstitutionService {
                 ListOfUniversityResponse listOfUniversityResponse = new ListOfUniversityResponse();
                 listOfUniversityResponse.setUniversities(universityList);
                 return ResponseEntity.ok(listOfUniversityResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Universities not found", "No universities exist","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Universities",e);
         }
-        return null;
     }
 
     @Override
@@ -150,11 +156,13 @@ public class InstitutionServiceImpl implements InstitutionService {
             if (universityOptional.isPresent()) {
                 universityRepository.deleteById(universityId);
                 return ResponseEntity.ok("University has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"University not found", "Invalid university Id "+universityId,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete University",e);
         }
-        return null;
     }
 
 }

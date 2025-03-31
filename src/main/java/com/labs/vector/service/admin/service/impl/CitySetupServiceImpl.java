@@ -68,11 +68,11 @@ public class CitySetupServiceImpl implements CitySetupService{
            city.setStateName(createCityRequest.getStateName());
 
            cityMasterRepository.save(city);
-           ResponseEntity.ok(city);
+           return ResponseEntity.ok(city);
        } catch (Exception e) {
            e.printStackTrace();
+           throw new RuntimeException("Error processing to create & Update City",e);
        }
-       return null;
     }
 
     @Override
@@ -83,11 +83,13 @@ public class CitySetupServiceImpl implements CitySetupService{
                 ListOfCityDistrictResponse listOfCityResponse = new ListOfCityDistrictResponse();
                 listOfCityResponse.setCityMasters(cityMasterList);
                 return ResponseEntity.ok(listOfCityResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"City not found", "Invalid cities ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Cities",e);
         }
-        return null;
     }
 
     @Override
@@ -98,12 +100,14 @@ public class CitySetupServiceImpl implements CitySetupService{
                 //Deleting region for respective city...
                 regionSetupService.deleteAllRegionByCityID(cityID);
                 cityMasterRepository.deleteById(cityID);
-                ResponseEntity.ok("City has been deleted successfully!");
+                 return ResponseEntity.ok("City has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"city not found", "Invalid city ID: "+cityID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete City",e);
         }
-        return null;
     }
 
     @Override
@@ -120,11 +124,13 @@ public class CitySetupServiceImpl implements CitySetupService{
                     deleteAllCityForState(city.getCityID());
                 }
                 return "SUCCESS";
+            }else {
+            return "ERROR: No city found for state Id: "+stateID;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete City by state Id",e);
         }
-        return null;
     }
 
     private void deleteAllCityForState(Integer cityID){
@@ -136,6 +142,7 @@ public class CitySetupServiceImpl implements CitySetupService{
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete All City For State",e);
         }
     }
 }

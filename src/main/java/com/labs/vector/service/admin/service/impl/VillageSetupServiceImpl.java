@@ -64,11 +64,11 @@ public class VillageSetupServiceImpl implements VillageSetupService {
 
             villageMasterRepository.save(villageMaster);
 
-            ResponseEntity.ok(villageMaster);
+            return ResponseEntity.ok(villageMaster);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to ceate update village", e);
         }
-        return null;
     }
 
     @Override
@@ -77,12 +77,14 @@ public class VillageSetupServiceImpl implements VillageSetupService {
             Optional<VillageMaster> regionMaster = villageMasterRepository.findById(villagID);
             if(regionMaster.isPresent()){
                 villageMasterRepository.deleteById(villagID);
-                ResponseEntity.ok("Region has been deleted successfully!");
+               return ResponseEntity.ok("Region has been deleted successfully!");
+            }else {
+                return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "village not found", "Invalid villag ID: " + villagID, "");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete village", e);
         }
-        return null;
     }
 
     @Override
@@ -95,9 +97,12 @@ public class VillageSetupServiceImpl implements VillageSetupService {
                     listOfVillageResponse.setVillageMasters(villageMasterListOptional.get());
                     return ResponseEntity.ok(listOfVillageResponse);
                 }
+            }else {
+                return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "village not found", "Invalid taluka ID: " + talukaID, "");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Village By TalukaID", e);
         }
         return null;
     }
@@ -110,11 +115,11 @@ public class VillageSetupServiceImpl implements VillageSetupService {
                 villageMasterRepository.deleteAll(villageMastersOptional.get());
                 return "SUCCESS";
             } else {
-                return "NO_VILLAGE_FOUND";
+                return "ERROR: Invalid taluka Id: "+talukaID;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete all Village By TalukaID", e);
         }
-        return "ERROR";
     }
 }

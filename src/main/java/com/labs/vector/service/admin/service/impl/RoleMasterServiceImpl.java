@@ -69,8 +69,8 @@ public class RoleMasterServiceImpl implements RoleMasterService {
             return ResponseEntity.ok("Role created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create role ",e);
         }
-        return null;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class RoleMasterServiceImpl implements RoleMasterService {
             return ResponseEntity.ok("Role deactivated successfully!");
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to make Inactive Role ",e);
         }
-        return  null;
     }
 }

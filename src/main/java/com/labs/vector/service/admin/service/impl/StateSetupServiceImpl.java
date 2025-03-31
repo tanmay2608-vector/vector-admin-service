@@ -75,11 +75,11 @@ public class StateSetupServiceImpl implements StateSetupService {
 
             stateMasterRepository.save(state);
 
-            ResponseEntity.ok(state);
+           return ResponseEntity.ok(state);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create update state ",e);
         }
-        return null;
     }
 
     @Override
@@ -90,11 +90,13 @@ public class StateSetupServiceImpl implements StateSetupService {
                 ListOfStateResponse listOfStateResponse = new ListOfStateResponse();
                 listOfStateResponse.setStateMasters(stateMasterList);
                 return ResponseEntity.ok(listOfStateResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"states not found", "No state exist: ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all states ",e);
         }
-        return null;
     }
 
     @Override
@@ -105,11 +107,13 @@ public class StateSetupServiceImpl implements StateSetupService {
                 ListOfStateResponse listOfStateResponse = new ListOfStateResponse();
                 listOfStateResponse.setStateMasters(stateMasterList);
                 return ResponseEntity.ok(listOfStateResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"ststes not found", "Invalid country ID: "+countryID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all states by country id ",e);
         }
-        return null;
     }
 
     @Override
@@ -123,12 +127,14 @@ public class StateSetupServiceImpl implements StateSetupService {
                 listOfCityDistrictResponse.setCityMasters(cityMasterList);
                 listOfCityDistrictResponse.setDistrictMasterList(districtMasterList);
 
-                ResponseEntity.ok(listOfCityDistrictResponse);
+                return ResponseEntity.ok(listOfCityDistrictResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"cities and district not found", "Invalid state ID: "+stateID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get Cities And District By StateID",e);
         }
-        return null;
     }
 
     @Override
@@ -140,11 +146,13 @@ public class StateSetupServiceImpl implements StateSetupService {
                     deleteStateById(state.getStateID());
                 }
                 return "SUCCESS";
+            }else {
+                return "ERROR: Invalid country Id: "+countryID;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete States By CountryID",e);
         }
-        return null;
     }
 
     private void deleteStateById(Integer stateID){
@@ -156,23 +164,26 @@ public class StateSetupServiceImpl implements StateSetupService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete States By ID",e);
         }
     }
 
     @Override
-    public ResponseEntity<?> deleteState(Integer stateID){
+    public ResponseEntity<?> deleteState(Integer stateID) {
         try {
             Optional<StateMaster> stateMaster = stateMasterRepository.findById(stateID);
-            if(stateMaster.isPresent()){
+            if (stateMaster.isPresent()) {
                 //Deleting cities for respective state..
                 citySetupService.deleteCityByStateID(stateID);
                 districtSetupService.deleteDistrictByStateID(stateID);
                 stateMasterRepository.deleteById(stateID);
-                ResponseEntity.ok("State has been deleted successfully!");
+                return ResponseEntity.ok("State has been deleted successfully!");
+            } else {
+                return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "state not found", "Invalid state ID: " + stateID, "");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete State", e);
         }
-        return null;
     }
 }

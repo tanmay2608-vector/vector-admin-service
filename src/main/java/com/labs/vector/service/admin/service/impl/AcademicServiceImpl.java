@@ -66,8 +66,9 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(academicYear);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to creat & update academic year",e);
         }
-        return null;
+
     }
 
     @Override
@@ -77,8 +78,9 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(academicYears);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all academic year",e);
         }
-        return null;
+
     }
 
     @Override
@@ -88,11 +90,13 @@ public class AcademicServiceImpl implements AcademicService {
             if (academicYear.isPresent()) {
                 academicYearRepository.deleteById(academicYearID);
                 return ResponseEntity.ok("Academic Year deleted successfully!");
+            }else{
+                return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Not found academic year", "Invalid academic year Id : "+academicYearID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete academic year",e);
         }
-        return null;
     }
 
     /*------------------------------ Class APIs -------------------------------------------*/
@@ -124,8 +128,9 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(classEntity);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to creat & update class",e);
         }
-        return null;
+
     }
 
     @Override
@@ -135,8 +140,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(classes);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all classes",e);
         }
-        return null;
     }
 
     @Override
@@ -146,11 +151,14 @@ public class AcademicServiceImpl implements AcademicService {
             if (classEntity.isPresent()) {
                 classRepository.deleteById(classID);
                 return ResponseEntity.ok("Class deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Class not found", "Invalid class ID : "+classID,"");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete class",e);
         }
-        return null;
     }
 
     /*------------------------------ Subject APIs -------------------------------------------*/
@@ -182,8 +190,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(subject);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & update subject",e);
         }
-        return null;
     }
 
     @Override
@@ -193,8 +201,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(subjects);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all subjects",e);
         }
-        return null;
     }
 
     @Override
@@ -204,11 +212,13 @@ public class AcademicServiceImpl implements AcademicService {
             if (subject.isPresent()) {
                 subjectRepository.deleteById(subjectID);
                 return ResponseEntity.ok("Subject deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Subject not found", "Invalid subject Id : "+subjectID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete subject",e);
         }
-        return null;
     }
 
     /*------------------------------ Category APIs -------------------------------------------*/
@@ -241,8 +251,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(category);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & Update Category",e);
         }
-        return null;
     }
 
     @Override
@@ -252,8 +262,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(categories);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Category",e);
         }
-        return null;
     }
 
     @Override
@@ -263,11 +273,13 @@ public class AcademicServiceImpl implements AcademicService {
             if (category.isPresent()) {
                 categoryRepository.deleteById(categoryID);
                 return ResponseEntity.ok("Category deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Category not found", "Invalid Category Id : "+categoryID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Category",e);
         }
-        return null;
     }
 
     /*------------------------------ Course APIs -------------------------------------------*/
@@ -300,8 +312,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(course);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create Update Course",e);
         }
-        return null;
     }
 
     @Override
@@ -311,8 +323,8 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(courses);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Course",e);
         }
-        return null;
     }
 
     @Override
@@ -322,11 +334,13 @@ public class AcademicServiceImpl implements AcademicService {
             if (course.isPresent()) {
                 courseRepository.deleteById(courseID);
                 return ResponseEntity.ok("Course deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"course not found", "Invalid course ID : "+courseID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Course",e);
         }
-        return null;
     }
 
     /*------------------------------ Semester APIs -------------------------------------------*/
@@ -358,7 +372,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(semester);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving Semester");
+            throw new RuntimeException("Error processing to create & Update Semester",e);
         }
     }
 
@@ -369,7 +383,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(semesters);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching Semesters");
+            throw new RuntimeException("Error processing to get all Semesters",e);
         }
     }
 
@@ -384,7 +398,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Semester not found!");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting Semester");
+            throw new RuntimeException("Error processing to delete Semester",e);
         }
     }
 
@@ -417,7 +431,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(topic);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving Topic");
+            throw new RuntimeException("Error processing to create & Update Topic",e);
         }
     }
 
@@ -428,7 +442,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.ok(topics);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching Topics");
+            throw new RuntimeException("Error processing to get all Topics",e);
         }
     }
 
@@ -443,7 +457,7 @@ public class AcademicServiceImpl implements AcademicService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Topic not found!");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting Topic");
+            throw new RuntimeException("Error processing to delete Topic",e);
         }
     }
 

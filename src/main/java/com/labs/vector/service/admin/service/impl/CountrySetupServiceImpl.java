@@ -28,7 +28,7 @@ public class CountrySetupServiceImpl implements CountrySetupService {
     @Override
     public ResponseEntity<?> createUpdateCountry(CreateCountryRequest createCountryRequest) {
         try {
-            if(createCountryRequest.getCountryId() == 0) {
+            if(createCountryRequest.getCountryId() != null && createCountryRequest.getCountryId() == 0) {
                 Optional<CountryMaster> country = countryMasterRepository.findByCountryName(createCountryRequest.getCountry());
                 if (country.isPresent()) {
                     return ResponseUtil.createErrorResponse(
@@ -69,8 +69,9 @@ public class CountrySetupServiceImpl implements CountrySetupService {
             return ResponseEntity.ok(countryMaster);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & Update Country",e);
+
         }
-        return null;
     }
 
     @Override
@@ -81,11 +82,13 @@ public class CountrySetupServiceImpl implements CountrySetupService {
                 ListOfCountryResponse listOfCountryResponse = new ListOfCountryResponse();
                 listOfCountryResponse.setCountryMasters(countryMasterList);
                 return ResponseEntity.ok(listOfCountryResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Country not found", "Invalid country ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Country",e);
         }
-        return null;
     }
 
     @Override
@@ -98,11 +101,13 @@ public class CountrySetupServiceImpl implements CountrySetupService {
 
                 countryMasterRepository.deleteById(countryID);
                 return ResponseEntity.ok("Country has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Country not found", "Invalid country Id : "+countryID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Country",e);
         }
-        return null;
     }
 
 

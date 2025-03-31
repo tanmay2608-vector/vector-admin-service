@@ -57,4 +57,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        ErrorDetail errorDetail = ErrorDetail.builder()
+                .error("Internal Server Error")
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR)
+                .message(ex.getMessage())
+                .description("An unexpected error occurred.")
+                .build();
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .errors(List.of(errorDetail))
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

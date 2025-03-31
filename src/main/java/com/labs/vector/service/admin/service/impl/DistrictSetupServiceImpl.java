@@ -67,8 +67,8 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
             return ResponseEntity.ok(districtMaster);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create & Update District",e);
         }
-        return null;
     }
 
     @Override
@@ -80,9 +80,12 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
                talukaSetupService.deleteTalukaByDistrictID(districtID);
                districtMasterRepository.deleteById(districtID);
                ResponseEntity.ok("District has been deleted successfully!");
+           }else {
+               return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"District not found", "Invalid District Id : "+districtID,"");
            }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete District",e);
         }
         return null;
     }
@@ -105,8 +108,8 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete District By StateID",e);
         }
-        return "ERROR";
     }
 
     private void deleteAllDistrictForState(Integer districtID){
@@ -118,6 +121,7 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete All District For State",e);
         }
     }
 }

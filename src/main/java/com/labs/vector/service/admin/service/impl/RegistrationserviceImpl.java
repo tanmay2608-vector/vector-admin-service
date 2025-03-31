@@ -43,6 +43,7 @@ public class RegistrationserviceImpl implements RegistrationService {
     public ResponseEntity<?> createVectorUser(CreateUserRequest createUserRequest) {
         try {
             // Check if the userName already exists in the database
+            System.out.println("test data");
             Optional<VectorRegisteredUser> vectorRegisteredUser = vectorRegisteredUserRepository.findByUserName(createUserRequest.getUserName());
             if (vectorRegisteredUser.isPresent() && vectorRegisteredUser.get() != null) {
                 // Return error response if the username is already taken
@@ -101,11 +102,11 @@ public class RegistrationserviceImpl implements RegistrationService {
             //Managing role....
             if(createUserRequest.getVectorRoleIDList() != null && createUserRequest.getVectorRoleIDList().size() > 0){
                 //clearing previous entries...
-                userRoleMasterMapRepository.deleteByUserID(vectorUser.getUserID());
+                userRoleMasterMapRepository.deleteByUserID(vectorUser.getVectorUserID());
 
                 for(Integer id : createUserRequest.getVectorRoleIDList()){
                     UserRoleMasterMap userRoleMasterMap = new UserRoleMasterMap();
-                    userRoleMasterMap.setUserID(vectorUser.getUserID());
+                    userRoleMasterMap.setUserID(vectorUser.getVectorUserID());
                     userRoleMasterMap.setRoleMaterID(id);
                     userRoleMasterMapRepository.save(userRoleMasterMap);
                 }
@@ -183,8 +184,8 @@ public class RegistrationserviceImpl implements RegistrationService {
             return ResponseEntity.ok(vectorAdminUser);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get Vector Admin User By ID ",e);
         }
-        return null;
     }
 
     @Override
@@ -200,8 +201,8 @@ public class RegistrationserviceImpl implements RegistrationService {
             return ResponseEntity.ok(vectorUser);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get Vector user User By ID ",e);
         }
-        return null;
     }
 
 }

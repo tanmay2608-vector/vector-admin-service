@@ -65,8 +65,8 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
             return ResponseEntity.ok(talukaMaster);
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to create Update Taluka", e);
         }
-        return null;
     }
 
     @Override
@@ -76,12 +76,14 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
             if(talukaMaster.isPresent()){
                 villageSetupService.deleteAllVillageByTalukaID(talukaID);
                 talukaMasterRepository.deleteById(talukaID);
-                ResponseEntity.ok("Taluka has been deleted successfully!");
+               return ResponseEntity.ok("Taluka has been deleted successfully!");
+            }else {
+                return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "Taluka not found", "Invalid taluka ID: " + talukaID, "");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Taluka", e);
         }
-        return null;
     }
 
     @Override
@@ -96,8 +98,8 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Taluka By DistrictID", e);
         }
-        return "";
     }
 
     private void deleteAllTalukaForDistrict(Integer talukaID){
@@ -109,6 +111,7 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete all Taluka for District", e);
         }
     }
 }

@@ -60,7 +60,7 @@ public class ActivityServiceImpl implements ActivityService {
             return ResponseEntity.ok(activity);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving Activity");
+            throw new RuntimeException("Error processing to create & Update Activity",e);
         }
     }
 
@@ -70,11 +70,13 @@ public class ActivityServiceImpl implements ActivityService {
             List<Activity> activityList = activityRepository.findAll();
             if (!activityList.isEmpty()) {
                 return ResponseEntity.ok(activityList);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT," Activities not found", "No activites exist : ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Activity",e);
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Activities Found");
     }
 
     @Override
@@ -84,11 +86,13 @@ public class ActivityServiceImpl implements ActivityService {
             if (activityOptional.isPresent()) {
                 activityRepository.deleteById(activityId);
                 return ResponseEntity.ok("Activity has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Activity not found", "Invalid activity Id : "+activityId,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Activity",e);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Activity not found");
     }
 
     /*------------------------------ Goal APIs -------------------------------------------*/
@@ -122,7 +126,7 @@ public class ActivityServiceImpl implements ActivityService {
             return ResponseEntity.ok(goal);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving Goal");
+            throw new RuntimeException("Error processing to create & update goal",e);
         }
     }
 
@@ -132,11 +136,13 @@ public class ActivityServiceImpl implements ActivityService {
             List<Goal> goalList = goalRepository.findAll();
             if (!goalList.isEmpty()) {
                 return ResponseEntity.ok(goalList);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Goals not found", "No goals exits ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all goal",e);
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Goals Found");
     }
 
     @Override
@@ -146,11 +152,13 @@ public class ActivityServiceImpl implements ActivityService {
             if (goalOptional.isPresent()) {
                 goalRepository.deleteById(goalId);
                 return ResponseEntity.ok("Goal has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Goal not found", "Invalid goal Id : "+goalId,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete goal",e);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Goal not found");
     }
 
     /*------------------------------ Event APIs -------------------------------------------*/
@@ -186,7 +194,7 @@ public class ActivityServiceImpl implements ActivityService {
             return ResponseEntity.ok(event);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving Event");
+            throw new RuntimeException("Error processing to create & Update Event",e);
         }
     }
 
@@ -196,11 +204,13 @@ public class ActivityServiceImpl implements ActivityService {
             List<Event> eventList = eventRepository.findAll();
             if (!eventList.isEmpty()) {
                 return ResponseEntity.ok(eventList);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Events not found", "No Events exist","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Events",e);
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No Events Found");
     }
 
     @Override
@@ -210,10 +220,12 @@ public class ActivityServiceImpl implements ActivityService {
             if (eventOptional.isPresent()) {
                 eventRepository.deleteById(eventId);
                 return ResponseEntity.ok("Event has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Event not found", "Invalid event Id : "+eventId,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Events",e);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Event not found");
     }
 }

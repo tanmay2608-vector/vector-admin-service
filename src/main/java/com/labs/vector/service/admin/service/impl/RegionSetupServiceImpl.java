@@ -64,11 +64,12 @@ public class RegionSetupServiceImpl implements RegionSetupService {
 
             regionMasterRepository.save(region);
 
-            ResponseEntity.ok(region);
+            return ResponseEntity.ok(region);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return null;
+           throw new RuntimeException("Error processing to create Update Region",e);
+
+       }
     }
 
     @Override
@@ -79,11 +80,13 @@ public class RegionSetupServiceImpl implements RegionSetupService {
                 ListOfRegionResponse listOfRegionResponse = new ListOfRegionResponse();
                 listOfRegionResponse.setRegionMasters(regionMasterList);
                 return ResponseEntity.ok(listOfRegionResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Regions not found", "No regions exist: ","");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get all Region ",e);
         }
-        return null;
     }
 
     @Override
@@ -92,12 +95,14 @@ public class RegionSetupServiceImpl implements RegionSetupService {
             Optional<RegionMaster> regionMaster = regionMasterRepository.findById(regionID);
             if(regionMaster.isPresent()){
                 regionMasterRepository.deleteById(regionID);
-                ResponseEntity.ok("Region has been deleted successfully!");
+                return ResponseEntity.ok("Region has been deleted successfully!");
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"region not found", "Invalid region ID: "+regionID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete Region ",e);
         }
-        return null;
     }
             
     @Override
@@ -108,11 +113,13 @@ public class RegionSetupServiceImpl implements RegionSetupService {
                 ListOfRegionResponse listOfRegionResponse = new ListOfRegionResponse();
                 listOfRegionResponse.setRegionMasters(regionMasterList);
                 return ResponseEntity.ok(listOfRegionResponse);
+            }else {
+                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Regions not found by city id", "Invalid city ID: "+cityID,"");
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to get All Region By CityID ",e);
         }
-        return null;
     }
 
     @Override
@@ -122,10 +129,12 @@ public class RegionSetupServiceImpl implements RegionSetupService {
            if(regionMasterList != null && regionMasterList.size()>0){
                regionMasterRepository.deleteAll(regionMasterList);
                return "SUCCESS";
+           }else {
+               return "ERROR: Invalid city Id: "+cityID;
            }
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException("Error processing to delete all Region By CityID ",e);
         }
-        return null;
     }
 }
