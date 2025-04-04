@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Data
 @Entity
-@Table(name = "role_master")
+@Table(name = "ROLE_MASTER")
 public class RoleMaster {
 
     @Id
@@ -16,8 +16,14 @@ public class RoleMaster {
     @Column(name = "role_id")
     private Integer roleId;
 
-    @Column(name = "role")
-    private String role;
+    @Column(name = "role_name")
+    private String roleName;
+
+    @Column(name = "role_description")
+    private String roleDescription;
+
+    @Column(name = "is_active")
+    private String isActive;
 
     @Column(name = "created_by_id")
     private Integer createdById;

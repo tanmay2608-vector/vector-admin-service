@@ -28,12 +28,12 @@ public class JwtAuthApiGatewayFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
                 String jsonResponse = """
-                    {
+                   {
                         "error" : "Unauthorized",
                         "statusCode" : "401",
                         "message" : "Access token is invalid or missing",
                         "description" : "Please provide valid access token" 
-                    }
+                   }
                     """;
 
                 response.getWriter().write(jsonResponse);

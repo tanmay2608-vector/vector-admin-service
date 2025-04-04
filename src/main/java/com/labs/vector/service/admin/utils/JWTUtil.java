@@ -13,11 +13,12 @@ import java.util.Map;
 
 public class JWTUtil {
     private static final String SECRET_KEY = "Q8vLdGx3Z5KrjT6NmWpX2ByHaC9ETWpXnC7KhJ0VR8Mw5OqZ";
+    private static final String REFRESH_SECRET_KEY = "Q8vLdGx3Z5KrjT6NmWpXtuifersETWpXnC7KhJ0VR8Mw5OqZ";
     public static String generateAccessToken(Object data){
         return Jwts.builder()
                 .claim("data",data)
                 .setIssuedAt(new Date(Instant.now().toEpochMilli()))
-                .setExpiration(new Date(Instant.now().plus(5, ChronoUnit.MINUTES).toEpochMilli()))
+                .setExpiration(new Date(Instant.now().plus(2, ChronoUnit.DAYS).toEpochMilli()))
                 .signWith(secretKey())
                 .compact();
     }
@@ -26,9 +27,30 @@ public class JWTUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
+    public static String genrateRefreshToken(Object data){
+        return Jwts.builder()
+                .claim("data",data)
+                .setIssuedAt(new Date(Instant.now().toEpochMilli()))
+                .setExpiration(new Date(Instant.now().plus(30, ChronoUnit.DAYS).toEpochMilli()))
+                .signWith(refreshSecretKey())
+                .compact();
+    }
+
+    private static SecretKey refreshSecretKey(){
+        return Keys.hmacShaKeyFor(REFRESH_SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+    }
+
     public static String getUserNameByToken(String token) {
-        Claims claims =  Jwts.parserBuilder()
-                        .setSigningKey(secretKey())
+        return getUserNameFromClaims(token,secretKey());
+    }
+
+    public static String getUserNameFromRefreshToken(String token){
+        return getUserNameFromClaims(token,refreshSecretKey());
+    }
+
+    public static String getUserNameFromClaims(String token, SecretKey key){
+        Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(key)
                         .build()
                         .parseClaimsJws(token)
                         .getBody();

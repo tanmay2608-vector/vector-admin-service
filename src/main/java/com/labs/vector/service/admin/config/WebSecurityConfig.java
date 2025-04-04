@@ -3,6 +3,7 @@ package com.labs.vector.service.admin.config;
 import com.labs.vector.service.admin.service.impl.JwtAuthApiGatewayFilter;
 import com.labs.vector.service.admin.service.impl.UserDetailsServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,18 +18,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 public class WebSecurityConfig {
 
     @Autowired
     private JwtAuthApiGatewayFilter jwtAuthApiGatewayFilter;
 
+    @Value("web.secure.enpoints")
+    private List<String> websecureEnpoitns;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request-> request
-                        .requestMatchers("/createUser","/api/*").permitAll()
+                        .requestMatchers(String.valueOf(websecureEnpoitns)).permitAll()
                         .anyRequest()
                         .authenticated()
                 )
