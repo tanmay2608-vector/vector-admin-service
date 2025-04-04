@@ -13,8 +13,8 @@ public class VectorRegisteredUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Integer userID;
+    @Column(name = "vector_user_id")
+    private Integer vectorUserID;
 
     @Column(name = "user_name")
     private String userName;
