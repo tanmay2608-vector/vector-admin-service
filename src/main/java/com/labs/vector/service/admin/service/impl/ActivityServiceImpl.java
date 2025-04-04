@@ -11,6 +11,8 @@ import com.labs.vector.service.admin.repository.EventRepository;
 import com.labs.vector.service.admin.repository.GoalRepository;
 import com.labs.vector.service.admin.service.ActivityService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ActivityServiceImpl implements ActivityService {
+    private static final Logger log = LoggerFactory.getLogger(ActivityServiceImpl.class);
     @Autowired
     private ActivityRepository activityRepository;
 
@@ -35,7 +38,9 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             if (createActivityRequest.getActivityId() != null && createActivityRequest.getActivityId() == 0) {
                 Optional<Activity> existingActivity = activityRepository.findByActivityName(createActivityRequest.getActivityName());
+                log.info("Existing Activity: {}",existingActivity.toString());
                 if (existingActivity.isPresent()) {
+                    log.info("Activity Already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -57,6 +62,7 @@ public class ActivityServiceImpl implements ActivityService {
             activity.setIsActive(createActivityRequest.getIsActive());
 
             activityRepository.save(activity);
+            log.info("Activity saved:{}", activity);
             return ResponseEntity.ok(activity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,8 +75,10 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             List<Activity> activityList = activityRepository.findAll();
             if (!activityList.isEmpty()) {
+                log.info("Activity List :{}",activityList.toString());
                 return ResponseEntity.ok(activityList);
             }else {
+                log.info("Acitvity not found");
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT," Activities not found", "No activites exist : ","");
             }
         } catch (Exception e) {
@@ -83,8 +91,10 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseEntity<?> deleteActivity(Integer activityId) {
         try {
             Optional<Activity> activityOptional = activityRepository.findById(activityId);
+            log.info("Activity:{}",activityOptional.toString());
             if (activityOptional.isPresent()) {
                 activityRepository.deleteById(activityId);
+                log.info("Activity Deleted successfully");
                 return ResponseEntity.ok("Activity has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Activity not found", "Invalid activity Id : "+activityId,"");
@@ -101,7 +111,9 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             if (createGoalRequest.getGoalId() != null && createGoalRequest.getGoalId() == 0) {
                 Optional<Goal> existingGoal = goalRepository.findByGoalName(createGoalRequest.getGoalName());
+                log.info("Goal:{}",existingGoal.toString());
                 if (existingGoal.isPresent()) {
+                    log.info("Goal Name already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -123,6 +135,7 @@ public class ActivityServiceImpl implements ActivityService {
             goal.setIsActive(createGoalRequest.getIsActive());
 
             goalRepository.save(goal);
+            log.info("Goal saved :{}", goal.toString());
             return ResponseEntity.ok(goal);
         } catch (Exception e) {
             e.printStackTrace();
@@ -135,6 +148,7 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             List<Goal> goalList = goalRepository.findAll();
             if (!goalList.isEmpty()) {
+                log.info("Goal List :{}", goalList.toString());
                 return ResponseEntity.ok(goalList);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Goals not found", "No goals exits ","");
@@ -149,8 +163,10 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseEntity<?> deleteGoal(Integer goalId) {
         try {
             Optional<Goal> goalOptional = goalRepository.findById(goalId);
+            log.info("Goal:{}",goalOptional.toString());
             if (goalOptional.isPresent()) {
                 goalRepository.deleteById(goalId);
+                log.info("Goal is deleted");
                 return ResponseEntity.ok("Goal has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Goal not found", "Invalid goal Id : "+goalId,"");
@@ -168,7 +184,9 @@ public class ActivityServiceImpl implements ActivityService {
             // Check for duplicate Event Name
             if (createEventRequest.getEventId() != null && createEventRequest.getEventId() == 0) {
                 Optional<Event> existingEvent = eventRepository.findByEventName(createEventRequest.getEventName());
+                log.info("Event:{}",existingEvent.toString());
                 if (existingEvent.isPresent()) {
+                    log.info("Event is already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -191,6 +209,7 @@ public class ActivityServiceImpl implements ActivityService {
             event.setIsActive(createEventRequest.getIsActive());
 
             eventRepository.save(event);
+            log.info("Event Saved:{}",event);
             return ResponseEntity.ok(event);
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,6 +222,7 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             List<Event> eventList = eventRepository.findAll();
             if (!eventList.isEmpty()) {
+                log.info("Event List :{}",eventList.toString());
                 return ResponseEntity.ok(eventList);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Events not found", "No Events exist","");
@@ -217,8 +237,10 @@ public class ActivityServiceImpl implements ActivityService {
     public ResponseEntity<?> deleteEvent(Integer eventId) {
         try {
             Optional<Event> eventOptional = eventRepository.findById(eventId);
+            log.info("Event :{}",eventOptional.toString());
             if (eventOptional.isPresent()) {
                 eventRepository.deleteById(eventId);
+                log.info("Event Deleted Successfully");
                 return ResponseEntity.ok("Event has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Event not found", "Invalid event Id : "+eventId,"");

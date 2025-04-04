@@ -8,6 +8,8 @@ import com.labs.vector.service.admin.service.DistrictSetupService;
 import com.labs.vector.service.admin.service.TalukaSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import java.util.Optional;
 
 @Service
 public class DistrictSetupServiceImpl implements DistrictSetupService {
+    private static final Logger log = LoggerFactory.getLogger(DistrictSetupServiceImpl.class);
 
     @Autowired
     DistrictMasterRepository districtMasterRepository;
@@ -31,7 +34,9 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
         try{
             if(createDistrictRequest.getDistrictID() == 0){
                 Optional<DistrictMaster> districtMaster = districtMasterRepository.findByStateIDAndDistrictName(createDistrictRequest.getStateID(), createDistrictRequest.getDistrictName());
+                log.info("District :{}",districtMaster.toString());
                 if(districtMaster.isPresent()){
+                    log.info("District Name already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -62,8 +67,9 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
             districtMaster.setStateName(createDistrictRequest.getStateName());
             districtMaster.setSortOrder(createDistrictRequest.getSortOrder());
             districtMaster.setIsDefault(createDistrictRequest.getIsDefault());
-            districtMasterRepository.save(districtMaster);
 
+            districtMasterRepository.save(districtMaster);
+            log.info("District saved :{}", districtMaster.toString());
             return ResponseEntity.ok(districtMaster);
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,10 +81,12 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
     public ResponseEntity<?> deleteDistrict(Integer districtID) {
         try{
            Optional<DistrictMaster> districtMaster = districtMasterRepository.findById(districtID);
+            log.info("District:{}",districtMaster.toString());
            if(districtMaster.isPresent()){
                //Deleting taluka for district..
                talukaSetupService.deleteTalukaByDistrictID(districtID);
                districtMasterRepository.deleteById(districtID);
+               log.info("District Deleted Successfully");
                ResponseEntity.ok("District has been deleted successfully!");
            }else {
                return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"District not found", "Invalid District Id : "+districtID,"");
@@ -93,6 +101,7 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
     @Override
     public List<DistrictMaster> getAllDistrictByStateID(Integer stateID) {
         Optional<List<DistrictMaster>> districtMasterList = districtMasterRepository.findByStateID(stateID);
+        log.info("District List :{}", districtMasterList.toString());
         return districtMasterList.get();
     }
 
@@ -100,8 +109,10 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
     public String deleteDistrictByStateID(Integer stateID) {
         try{
             Optional<List<DistrictMaster>> districtMasterOptional = districtMasterRepository.findByStateID(stateID);
+            log.info("District:{}",districtMasterOptional.toString());
             if (districtMasterOptional.isPresent()) {
                 districtMasterOptional.get().forEach(districtMaster -> deleteAllDistrictForState(districtMaster.getDistrictID()));
+                log.info("District Deleted by State Id");
                 return "SUCCESS";
             } else {
                 return "NO_DISTRICTS_FOUND";
@@ -118,6 +129,8 @@ public class DistrictSetupServiceImpl implements DistrictSetupService {
                 //Deleting taluka for respective district...
                 talukaSetupService.deleteTalukaByDistrictID(districtID);
                 districtMasterRepository.deleteById(districtID);
+                log.info("ALl district deleted by state");
+
             }
         } catch (Exception e) {
             e.printStackTrace();

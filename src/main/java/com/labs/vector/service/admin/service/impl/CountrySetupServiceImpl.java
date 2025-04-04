@@ -8,6 +8,8 @@ import com.labs.vector.service.admin.service.CountrySetupService;
 import com.labs.vector.service.admin.service.StateSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import java.util.Optional;
 
 @Service
 public class CountrySetupServiceImpl implements CountrySetupService {
-
+    private static final Logger log = LoggerFactory.getLogger(CountrySetupServiceImpl.class);
     @Autowired
     CountryMasterRepository countryMasterRepository;
 
@@ -30,7 +32,9 @@ public class CountrySetupServiceImpl implements CountrySetupService {
         try {
             if(createCountryRequest.getCountryId() != null && createCountryRequest.getCountryId() == 0) {
                 Optional<CountryMaster> country = countryMasterRepository.findByCountryName(createCountryRequest.getCountry());
+                log.info("Country :{}",country.toString());
                 if (country.isPresent()) {
+                    log.info("Country Name already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -65,7 +69,7 @@ public class CountrySetupServiceImpl implements CountrySetupService {
             countryMaster.setPincodeLength(createCountryRequest.getPincodeLength());
             countryMaster.setIsDefault(createCountryRequest.getIsDefault());
             countryMasterRepository.save(countryMaster);
-
+            log.info("Country saved successfully :{}",countryMaster.toString());
             return ResponseEntity.ok(countryMaster);
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,6 +82,7 @@ public class CountrySetupServiceImpl implements CountrySetupService {
     public ResponseEntity<?> getAllCountry() {
         try {
             List<CountryMaster> countryMasterList = countryMasterRepository.findAll();
+            log.info("Country List :{}",countryMasterList.toString());
             if(countryMasterList != null && !countryMasterList.isEmpty()){
                 ListOfCountryResponse listOfCountryResponse = new ListOfCountryResponse();
                 listOfCountryResponse.setCountryMasters(countryMasterList);
@@ -95,11 +100,12 @@ public class CountrySetupServiceImpl implements CountrySetupService {
     public ResponseEntity<?> deleteCountry(Integer countryID) {
         try {
             Optional<CountryMaster> existingCountry = countryMasterRepository.findById(countryID);
+            log.info("Existing Country :{}",existingCountry.toString());
             if(existingCountry.isPresent() && existingCountry.get() != null){
                 //Deleting states for respective country..
                 stateSetupService.deleteStatesByCountryID(countryID);
-
                 countryMasterRepository.deleteById(countryID);
+                log.info("Country Deleted Successfully");
                 return ResponseEntity.ok("Country has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Country not found", "Invalid country Id : "+countryID,"");

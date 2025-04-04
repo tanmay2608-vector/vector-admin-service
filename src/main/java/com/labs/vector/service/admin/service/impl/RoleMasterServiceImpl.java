@@ -11,6 +11,8 @@ import com.labs.vector.service.admin.service.RoleMasterService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import com.labs.vector.service.admin.utils.exceptions.UserAlreadyExistsException;
 import com.labs.vector.service.admin.utils.exceptions.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 @Service
 public class RoleMasterServiceImpl implements RoleMasterService {
+    private static final Logger log = LoggerFactory.getLogger(RoleMasterServiceImpl.class);
     @Autowired
     private RoleMaterRepository roleMaterRepository;
 
@@ -30,8 +33,9 @@ public class RoleMasterServiceImpl implements RoleMasterService {
     @Override
     public ResponseEntity<?> getAllVectorRoles() {
         List<RoleMaster> roleMasterList = roleMaterRepository.findAll();
-
+        log.info("Vector Roles :{}",roleMasterList.toString());
         if (roleMasterList.isEmpty()) {
+            log.info("NO roles exists in database");
             return ResponseUtil.createErrorResponse(
                     HttpStatus.NO_CONTENT,
                     "No roles available",
@@ -56,6 +60,7 @@ public class RoleMasterServiceImpl implements RoleMasterService {
             RoleMaster roleMaster = new RoleMaster();
             if(createRoleRequest.getRoleID() != null && createRoleRequest.getRoleID() > 0){
                 Optional<RoleMaster> existingRole = roleMaterRepository.findById(createRoleRequest.getRoleID());
+                log.info("Existing Role :{}",existingRole.toString());
                 if (existingRole.isPresent()){
                     roleMaster = existingRole.get();
                 }
@@ -65,7 +70,7 @@ public class RoleMasterServiceImpl implements RoleMasterService {
             roleMaster.setRoleDescription(createRoleRequest.getDescription());
             roleMaster.setIsActive(createRoleRequest.getIsActive());
             roleMaterRepository.save(roleMaster);
-
+            log.info("Role Saved :{}",roleMaster.toString());
             return ResponseEntity.ok("Role created successfully!");
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,6 +90,7 @@ public class RoleMasterServiceImpl implements RoleMasterService {
 
             roleMaster.setIsActive("N");
             roleMaterRepository.save(roleMaster);
+            log.info("Role Deactive successfully");
             return ResponseEntity.ok("Role deactivated successfully!");
         } catch (Exception e) {
             e.printStackTrace();

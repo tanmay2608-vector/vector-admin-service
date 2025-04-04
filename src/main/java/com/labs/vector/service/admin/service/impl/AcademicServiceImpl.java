@@ -9,12 +9,13 @@ import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
 public class AcademicServiceImpl implements AcademicService {
-
+    private static final Logger log = LoggerFactory.getLogger(AcademicServiceImpl.class);
     @Autowired
     private AcademicYearRepository academicYearRepository;
 
@@ -42,6 +43,7 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createAcademicYearRequest.getAcademicYearID() != null && createAcademicYearRequest.getAcademicYearID() == 0) {
                 Optional<AcademicYear> existingAcademicYear = academicYearRepository.findByYear(createAcademicYearRequest.getYear());
+
                 if (existingAcademicYear.isPresent()) {
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
@@ -61,8 +63,8 @@ public class AcademicServiceImpl implements AcademicService {
             }
             academicYear.setYear(createAcademicYearRequest.getYear());
             academicYear.setIsActive(createAcademicYearRequest.getIsActive());
-
             academicYearRepository.save(academicYear);
+            log.info("Academic Year :{}", academicYear.toString());
             return ResponseEntity.ok(academicYear);
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,6 +77,7 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> getAllAcademicYear() {
         try {
             List<AcademicYear> academicYears = academicYearRepository.findAll();
+            log.info("All Academic Year are : {}", academicYears.toString());
             return ResponseEntity.ok(academicYears);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,6 +92,7 @@ public class AcademicServiceImpl implements AcademicService {
             Optional<AcademicYear> academicYear = academicYearRepository.findById(academicYearID);
             if (academicYear.isPresent()) {
                 academicYearRepository.deleteById(academicYearID);
+                log.info("Academic Year sucessfully deleted");
                 return ResponseEntity.ok("Academic Year deleted successfully!");
             }else{
                 return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Not found academic year", "Invalid academic year Id : "+academicYearID,"");
@@ -105,7 +109,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createClassRequest.getClassId() != null && createClassRequest.getClassId() == 0) {
                 Optional<Class> existingClass = classRepository.findByClassName(createClassRequest.getClassName());
+
                 if (existingClass.isPresent()) {
+                    log.info("Class already exists : {}", existingClass.toString());
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -125,6 +131,7 @@ public class AcademicServiceImpl implements AcademicService {
             classEntity.setIsActive(createClassRequest.getIsActive());
 
             classRepository.save(classEntity);
+            log.info("Class is created: {}",classEntity);
             return ResponseEntity.ok(classEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,6 +144,7 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> getAllClasses() {
         try {
             List<Class> classes = classRepository.findAll();
+            log.info("Classes : {}", classes.toString());
             return ResponseEntity.ok(classes);
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,7 +157,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             Optional<Class> classEntity = classRepository.findById(classID);
             if (classEntity.isPresent()) {
+                log.info("Class Entity : {}",classEntity.toString());
                 classRepository.deleteById(classID);
+                log.info("Class Entity is Deleted by Id : {}", classEntity.toString());
                 return ResponseEntity.ok("Class deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Class not found", "Invalid class ID : "+classID,"");
@@ -167,7 +177,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createSubjectRequest.getSubjectId() != null && createSubjectRequest.getSubjectId() == 0) {
                 Optional<Subject> existingSubject = subjectRepository.findBySubjectName(createSubjectRequest.getSubjectName());
+                log.info("Existing Subject : {}", existingSubject.toString());
                 if (existingSubject.isPresent()) {
+                    log.info("Subject already exists.");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -181,12 +193,14 @@ public class AcademicServiceImpl implements AcademicService {
                 Optional<Subject> existingSubject = subjectRepository.findById(createSubjectRequest.getSubjectId());
                 if (existingSubject.isPresent()) {
                     subject = existingSubject.get();
+
                 }
             }
             subject.setSubjectName(createSubjectRequest.getSubjectName());
             subject.setIsActive(createSubjectRequest.getIsActive());
 
             subjectRepository.save(subject);
+            log.info("Subject :{}", subject.toString());
             return ResponseEntity.ok(subject);
         } catch (Exception e) {
             e.printStackTrace();
@@ -198,6 +212,7 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> getAllSubjects() {
         try {
             List<Subject> subjects = subjectRepository.findAll();
+            log.info("Subjets :{}", subjects.toString());
             return ResponseEntity.ok(subjects);
         } catch (Exception e) {
             e.printStackTrace();
@@ -209,10 +224,13 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> deleteSubject(Integer subjectID) {
         try {
             Optional<Subject> subject = subjectRepository.findById(subjectID);
+            log.info("Subject :{}", subject.toString());
             if (subject.isPresent()) {
                 subjectRepository.deleteById(subjectID);
+                log.info("Subject is deleted successfully");
                 return ResponseEntity.ok("Subject deleted successfully!");
             }else {
+                log.info("Subject not found");
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Subject not found", "Invalid subject Id : "+subjectID,"");
             }
         } catch (Exception e) {
@@ -227,7 +245,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createCategoryRequest.getCategoryId() != null && createCategoryRequest.getCategoryId() == 0) {
                 Optional<Category> existingCategory = categoryRepository.findByCategoryName(createCategoryRequest.getCategoryName());
+                log.info("Existing Category: {}", existingCategory.toString());
                 if (existingCategory.isPresent()) {
+                    log.info("Category is already present please use different name.");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -248,6 +268,7 @@ public class AcademicServiceImpl implements AcademicService {
             category.setIsActive(createCategoryRequest.getIsActive());
 
             categoryRepository.save(category);
+            log.info("Category:{}", category.toString());
             return ResponseEntity.ok(category);
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,6 +280,7 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> getAllCategories() {
         try {
             List<Category> categories = categoryRepository.findAll();
+            log.info("All Gategories : {}", categories.toString());
             return ResponseEntity.ok(categories);
         } catch (Exception e) {
             e.printStackTrace();
@@ -270,10 +292,13 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> deleteCategory(Integer categoryID) {
         try {
             Optional<Category> category = categoryRepository.findById(categoryID);
+            log.info("category :{}", category.toString());
             if (category.isPresent()) {
                 categoryRepository.deleteById(categoryID);
+                log.info("Category is deleted successfully");
                 return ResponseEntity.ok("Category deleted successfully!");
             }else {
+                log.info("Category not found ");
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Category not found", "Invalid Category Id : "+categoryID,"");
             }
         } catch (Exception e) {
@@ -288,7 +313,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createCourseRequest.getCourseId() != null && createCourseRequest.getCourseId() == 0) {
                 Optional<Course> existingCourse = courseRepository.findByCourseName(createCourseRequest.getCourseName());
+                log.info("Existing Course : {}", existingCourse.toString());
                 if (existingCourse.isPresent()) {
+                    log.info("Course Name already exists.");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -309,6 +336,7 @@ public class AcademicServiceImpl implements AcademicService {
             course.setIsActive(createCourseRequest.getIsActive());
 
             courseRepository.save(course);
+            log.info("Course :{}", course.toString());
             return ResponseEntity.ok(course);
         } catch (Exception e) {
             e.printStackTrace();
@@ -320,6 +348,7 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> getAllCourses() {
         try {
             List<Course> courses = courseRepository.findAll();
+            log.info("Courses :{}", courses.toString());
             return ResponseEntity.ok(courses);
         } catch (Exception e) {
             e.printStackTrace();
@@ -331,8 +360,10 @@ public class AcademicServiceImpl implements AcademicService {
     public ResponseEntity<?> deleteCourse(Integer courseID) {
         try {
             Optional<Course> course = courseRepository.findById(courseID);
+            log.info("Course :{}", course.toString());
             if (course.isPresent()) {
                 courseRepository.deleteById(courseID);
+                log.info("Course Deleted Successfully");
                 return ResponseEntity.ok("Course deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"course not found", "Invalid course ID : "+courseID,"");
@@ -349,7 +380,9 @@ public class AcademicServiceImpl implements AcademicService {
         try {
             if (createSemesterRequest.getSemesterId() != null && createSemesterRequest.getSemesterId() == 0) {
                 Optional<Semester> existingSemester = semesterRepository.findBySemesterName(createSemesterRequest.getSemesterName());
+                log.info("Existing Semester : {}", existingSemester.toString());
                 if (existingSemester.isPresent()) {
+                    log.info("Semester Name already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -369,6 +402,7 @@ public class AcademicServiceImpl implements AcademicService {
             semester.setIsActive(createSemesterRequest.getIsActive());
 
             semesterRepository.save(semester);
+            log.info("Semester : {}", semester.toString());
             return ResponseEntity.ok(semester);
         } catch (Exception e) {
             e.printStackTrace();
