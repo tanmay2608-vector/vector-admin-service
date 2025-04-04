@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -27,7 +29,7 @@ import java.util.Optional;
 
 @Service
 public class RegistrationserviceImpl implements RegistrationService {
-
+    private static final Logger log = LoggerFactory.getLogger(RegistrationService.class);
     @Autowired
     VectorRegisteredUserRepository vectorRegisteredUserRepository;
 
@@ -43,7 +45,7 @@ public class RegistrationserviceImpl implements RegistrationService {
     public ResponseEntity<?> createVectorUser(CreateUserRequest createUserRequest) {
         try {
             // Check if the userName already exists in the database
-            System.out.println("test data");
+            log.info("test data");
             Optional<VectorRegisteredUser> vectorRegisteredUser = vectorRegisteredUserRepository.findByUserName(createUserRequest.getUserName());
             if (vectorRegisteredUser.isPresent() && vectorRegisteredUser.get() != null) {
                 // Return error response if the username is already taken
@@ -55,6 +57,7 @@ public class RegistrationserviceImpl implements RegistrationService {
                 );
             }
             VectorRegisteredUser vectorUser = new VectorRegisteredUser();
+            log.info("Vector User : {}", vectorUser.toString());
 
             //Updating user details of user is already exist...
             if(createUserRequest.getUserID() != null && createUserRequest.getUserID() > 0){
@@ -136,6 +139,7 @@ public class RegistrationserviceImpl implements RegistrationService {
                     createLoggedUserRequest.getPassword());
 
             if (vectorRegisteredUser.isPresent()) {
+                log.info("vector Register User is Present");
                 return ResponseUtil.createSuccessResponse(HttpStatus.OK, vectorRegisteredUser);
             }else {
                 return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,
@@ -162,12 +166,15 @@ public class RegistrationserviceImpl implements RegistrationService {
                                 "User not found with userId: " + userID,
                                 "404"
                         ));
+        log.info("Vector Admin User : {}", vectorAdminUser.toString());
 
         List<VectorRegisteredUser> vectorAdminUsers = vectorRegisteredUserRepository.findAll();
         List<UserDetailsEntity> vectorUsers = userDetailsRepository.findAll();
         ListOfUserResponse listUser = new ListOfUserResponse();
         listUser.setVectorAdminusers(vectorAdminUsers);
         listUser.setVectorUsers(vectorUsers);
+
+        log.info("Users List :{}", vectorUsers.toString());
         return ResponseEntity.ok(listUser);
     }
 
@@ -180,8 +187,8 @@ public class RegistrationserviceImpl implements RegistrationService {
                                     "User not found with userId: " + userID,
                                     "404"
                             ));
-
-            return ResponseEntity.ok(vectorAdminUser);
+            log.info("Vector Admin User By Id : {}", vectorAdminUser.toString());
+        return ResponseEntity.ok(vectorAdminUser);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error processing to get Vector Admin User By ID ",e);
@@ -197,7 +204,7 @@ public class RegistrationserviceImpl implements RegistrationService {
                                     "User not found with userId: " + userID,
                                     "404"
                             ));
-
+            log.info("User :{}",vectorUser.toString());
             return ResponseEntity.ok(vectorUser);
         } catch (Exception e) {
             e.printStackTrace();

@@ -8,6 +8,8 @@ import com.labs.vector.service.admin.service.CitySetupService;
 import com.labs.vector.service.admin.service.RegionSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @Service
 public class CitySetupServiceImpl implements CitySetupService{
+    private static final Logger log = LoggerFactory.getLogger(CitySetupServiceImpl.class);
 
     @Autowired
     CityMasterRepository cityMasterRepository;
@@ -30,7 +33,9 @@ public class CitySetupServiceImpl implements CitySetupService{
        try{
            if(createCityRequest.getCityID() == 0) {
                Optional<CityMaster> cityMaster = cityMasterRepository.findByCityNameAndStateID(createCityRequest.getCityName(), createCityRequest.getStateID());
+               log.info("City:{}",cityMaster.toString());
                if (cityMaster.isPresent()) {
+                   log.info("City name already exists");
                    ResponseUtil.createErrorResponse(
                            HttpStatus.BAD_REQUEST,
                            "Data duplicates",
@@ -68,6 +73,7 @@ public class CitySetupServiceImpl implements CitySetupService{
            city.setStateName(createCityRequest.getStateName());
 
            cityMasterRepository.save(city);
+           log.info("City Saved :{}",city.toString());
            return ResponseEntity.ok(city);
        } catch (Exception e) {
            e.printStackTrace();
@@ -82,6 +88,7 @@ public class CitySetupServiceImpl implements CitySetupService{
             if(cityMasterList != null && !cityMasterList.isEmpty()){
                 ListOfCityDistrictResponse listOfCityResponse = new ListOfCityDistrictResponse();
                 listOfCityResponse.setCityMasters(cityMasterList);
+                log.info("City List :{}", cityMasterList.toString());
                 return ResponseEntity.ok(listOfCityResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"City not found", "Invalid cities ","");
@@ -96,10 +103,12 @@ public class CitySetupServiceImpl implements CitySetupService{
     public ResponseEntity<?> deleteCity(Integer cityID) {
         try {
             Optional<CityMaster> cityMaster = cityMasterRepository.findById(cityID);
+            log.info("City : {}",cityMaster.toString());
             if(cityMaster.isPresent()){
                 //Deleting region for respective city...
                 regionSetupService.deleteAllRegionByCityID(cityID);
                 cityMasterRepository.deleteById(cityID);
+                log.info("City deleted successfully");
                  return ResponseEntity.ok("City has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"city not found", "Invalid city ID: "+cityID,"");
@@ -111,17 +120,17 @@ public class CitySetupServiceImpl implements CitySetupService{
     }
 
     @Override
-    public List<CityMaster> getAllCityByStateID(Integer stateID) {
-        return cityMasterRepository.findByStateID(stateID);
-    }
+    public List<CityMaster> getAllCityByStateID(Integer stateID) {return cityMasterRepository.findByStateID(stateID);}
 
     @Override
     public String deleteCityByStateID(Integer stateID) {
         try {
             List<CityMaster> cityMasterList  = cityMasterRepository.findByStateID(stateID);
+            log.info("City:{}",cityMasterList.toString());
             if(cityMasterList != null && cityMasterList.size() > 0){
                 for(CityMaster city : cityMasterList){
                     deleteAllCityForState(city.getCityID());
+                    log.info("Delete City by State Id");
                 }
                 return "SUCCESS";
             }else {
@@ -139,6 +148,7 @@ public class CitySetupServiceImpl implements CitySetupService{
                 //Deleting region for respective cityID...
                 regionSetupService.deleteAllRegionByCityID(cityID);
                 cityMasterRepository.deleteById(cityID);
+                log.info("All City Deleted by state");
             }
         } catch (Exception e) {
             e.printStackTrace();

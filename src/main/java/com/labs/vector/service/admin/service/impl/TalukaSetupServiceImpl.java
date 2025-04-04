@@ -8,6 +8,8 @@ import com.labs.vector.service.admin.service.TalukaSetupService;
 import com.labs.vector.service.admin.service.VillageSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.Optional;
 
 @Service
 public class TalukaSetupServiceImpl implements TalukaSetupService {
+    private static final Logger log = LoggerFactory.getLogger(TalukaSetupServiceImpl.class);
 
     @Autowired
     TalukaMasterRepository talukaMasterRepository;
@@ -30,7 +33,9 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
         try{
             if(createTalukaRequest.getTalukaID() == 0){
                 Optional<TalukaMaster> talukaMaster = talukaMasterRepository.findByDistrictIDAndTalukaName(createTalukaRequest.getDistrictID(), createTalukaRequest.getTalukaName());
+                log.info("Taluka:{}",talukaMaster.toString());
                 if(talukaMaster.isPresent()){
+                    log.info("Taluka Name already exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -62,6 +67,7 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
             talukaMaster.setSortOrder(createTalukaRequest.getSortOrder());
             talukaMaster.setIsDefault(createTalukaRequest.getIsDefault());
             talukaMasterRepository.save(talukaMaster);
+            log.info("Taluka Saved :{}",talukaMaster.toString());
             return ResponseEntity.ok(talukaMaster);
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,9 +79,11 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
     public ResponseEntity<?> deleteTaluka(Integer talukaID) {
         try{
             Optional<TalukaMaster> talukaMaster = talukaMasterRepository.findById(talukaID);
+            log.info("Taluka:{}",talukaMaster.toString());
             if(talukaMaster.isPresent()){
                 villageSetupService.deleteAllVillageByTalukaID(talukaID);
                 talukaMasterRepository.deleteById(talukaID);
+                log.info("Taluka has been deleted successfully");
                return ResponseEntity.ok("Taluka has been deleted successfully!");
             }else {
                 return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "Taluka not found", "Invalid taluka ID: " + talukaID, "");
@@ -90,8 +98,10 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
     public String deleteTalukaByDistrictID(Integer districtID) {
         try {
             Optional<List<TalukaMaster>> talukaMastersOptional = talukaMasterRepository.findByDistrictID(districtID);
+            log.info("Taluka:{}",talukaMastersOptional.toString());
             if (talukaMastersOptional.isPresent()) {
                 talukaMastersOptional.get().forEach(talukaMaster -> deleteAllTalukaForDistrict(talukaMaster.getTalukaID()));
+                log.info("Taluka Deleted by District");
                 return "SUCCESS";
             } else {
                 return "NO_TALUKA_FOUND";
@@ -108,6 +118,7 @@ public class TalukaSetupServiceImpl implements TalukaSetupService {
                 //Deleting taluka for respective districts...
                 villageSetupService.deleteAllVillageByTalukaID(talukaID);
                 talukaMasterRepository.deleteById(talukaID);
+                log.info("All taluka deleted");
             }
         } catch (Exception e) {
             e.printStackTrace();

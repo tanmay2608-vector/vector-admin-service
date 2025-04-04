@@ -12,6 +12,8 @@ import com.labs.vector.service.admin.service.DistrictSetupService;
 import com.labs.vector.service.admin.service.StateSetupService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 @Service
 public class StateSetupServiceImpl implements StateSetupService {
+    private static final Logger log = LoggerFactory.getLogger(StateSetupServiceImpl.class);
 
     @Autowired
     StateMasterRepository stateMasterRepository;
@@ -38,7 +41,9 @@ public class StateSetupServiceImpl implements StateSetupService {
             //checking state already exits for respective country...
             if(createStateRequest.getStateID() == 0) {
                 Optional<StateMaster> stateMaster = stateMasterRepository.findByStateNameAndCountryID(createStateRequest.getStateName(), createStateRequest.getCountryID());
+                log.info("State :{}",stateMaster.toString());
                 if (stateMaster.isPresent()) {
+                    log.info("State name already exists");
                     ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -74,7 +79,7 @@ public class StateSetupServiceImpl implements StateSetupService {
             state.setShortStateName(createStateRequest.getShortStateName());
 
             stateMasterRepository.save(state);
-
+            log.info("State Saved :{}",state.toString());
            return ResponseEntity.ok(state);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,6 +94,7 @@ public class StateSetupServiceImpl implements StateSetupService {
             if(stateMasterList != null && !stateMasterList.isEmpty()){
                 ListOfStateResponse listOfStateResponse = new ListOfStateResponse();
                 listOfStateResponse.setStateMasters(stateMasterList);
+                log.info("All State :{}",stateMasterList.toString());
                 return ResponseEntity.ok(listOfStateResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"states not found", "No state exist: ","");
@@ -106,6 +112,7 @@ public class StateSetupServiceImpl implements StateSetupService {
             if(stateMasterList != null && stateMasterList.size() > 0){
                 ListOfStateResponse listOfStateResponse = new ListOfStateResponse();
                 listOfStateResponse.setStateMasters(stateMasterList);
+                log.info("State List by Country :{}",stateMasterList.toString());
                 return ResponseEntity.ok(listOfStateResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"ststes not found", "Invalid country ID: "+countryID,"");
@@ -126,7 +133,8 @@ public class StateSetupServiceImpl implements StateSetupService {
                 ListOfCityDistrictResponse listOfCityDistrictResponse = new ListOfCityDistrictResponse();
                 listOfCityDistrictResponse.setCityMasters(cityMasterList);
                 listOfCityDistrictResponse.setDistrictMasterList(districtMasterList);
-
+                log.info("City List by state:{}",cityMasterList.toString());
+                log.info("District List by state:{}",districtMasterList.toString());
                 return ResponseEntity.ok(listOfCityDistrictResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"cities and district not found", "Invalid state ID: "+stateID,"");
@@ -141,10 +149,12 @@ public class StateSetupServiceImpl implements StateSetupService {
     public String deleteStatesByCountryID(Integer countryID) {
         try {
             List<StateMaster> stateMasterList = stateMasterRepository.findByCountryID(countryID);
+            log.info("State : {}", stateMasterList.toString());
             if(stateMasterList != null && stateMasterList.size() > 0){
                 for(StateMaster state : stateMasterList){
                     deleteStateById(state.getStateID());
                 }
+                log.info("State Deleted Successfully.....");
                 return "SUCCESS";
             }else {
                 return "ERROR: Invalid country Id: "+countryID;
@@ -161,6 +171,7 @@ public class StateSetupServiceImpl implements StateSetupService {
                 //Deleting cities for respective state..
                 citySetupService.deleteCityByStateID(stateID);
                 stateMasterRepository.deleteById(stateID);
+                log.info("State Successfully Deleted");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,6 +188,7 @@ public class StateSetupServiceImpl implements StateSetupService {
                 citySetupService.deleteCityByStateID(stateID);
                 districtSetupService.deleteDistrictByStateID(stateID);
                 stateMasterRepository.deleteById(stateID);
+                log.info("State has been deleted successfully");
                 return ResponseEntity.ok("State has been deleted successfully!");
             } else {
                 return ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT, "state not found", "Invalid state ID: " + stateID, "");

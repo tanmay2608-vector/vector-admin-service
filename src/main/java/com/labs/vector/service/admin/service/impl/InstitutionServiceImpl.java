@@ -10,6 +10,8 @@ import com.labs.vector.service.admin.repository.SchoolRepository;
 import com.labs.vector.service.admin.repository.UniversityRepository;
 import com.labs.vector.service.admin.service.InstitutionService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.Optional;
 
 @Service
 public class InstitutionServiceImpl implements InstitutionService {
+    private static final Logger log = LoggerFactory.getLogger(InstitutionServiceImpl.class);
 
     @Autowired
     SchoolRepository schoolRepository;
@@ -32,7 +35,9 @@ public class InstitutionServiceImpl implements InstitutionService {
         try{
             if(createSchoolRequest.getSchoolId() != null && createSchoolRequest.getSchoolId() == 0) {
                 Optional<School> schoolOptional = schoolRepository.findBySchoolName(createSchoolRequest.getSchoolName());
+                log.info("School:{}",schoolOptional.toString());
                 if (schoolOptional.isPresent()) {
+                    log.info("School name already exists");
                     ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -57,6 +62,7 @@ public class InstitutionServiceImpl implements InstitutionService {
             school.setIsActive(createSchoolRequest.getIsActive());
 
             schoolRepository.save(school);
+            log.info("School Saved:{}", school.toString());
            return ResponseEntity.ok(school);
         } catch (Exception e) {
             e.printStackTrace();
@@ -71,6 +77,7 @@ public class InstitutionServiceImpl implements InstitutionService {
             if(schoolList != null && !schoolList.isEmpty()){
                 ListOfSchoolResponse listOfSchoolResponse = new ListOfSchoolResponse();
                 listOfSchoolResponse.setSchoolList(schoolList);
+                log.info("School List :{}",schoolList.toString());
                 return ResponseEntity.ok(listOfSchoolResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"schools not found", "No schools exist ","");
@@ -85,8 +92,10 @@ public class InstitutionServiceImpl implements InstitutionService {
     public ResponseEntity<?> deleteSchool(Integer schoolId) {
         try {
             Optional<School> schoolOptional = schoolRepository.findById(schoolId);
+            log.info("School :{}",schoolOptional.toString());
             if(schoolOptional.isPresent()){
                 schoolRepository.deleteById(schoolId);
+                log.info("School Deleted Successfull");
                 return ResponseEntity.ok("School has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"School not found", "Invalid school Id : "+schoolId,"");
@@ -102,7 +111,9 @@ public class InstitutionServiceImpl implements InstitutionService {
         try {
             if (createUniversityRequest.getUniversityId() != null && createUniversityRequest.getUniversityId() == 0) {
                 Optional<University> universityOptional = universityRepository.findByUniversityName(createUniversityRequest.getUniversityName());
+                log.info("University:{}",universityOptional.toString());
                 if (universityOptional.isPresent()) {
+                    log.info("University already Exists");
                     return ResponseUtil.createErrorResponse(
                             HttpStatus.BAD_REQUEST,
                             "Data duplicates",
@@ -125,6 +136,7 @@ public class InstitutionServiceImpl implements InstitutionService {
             university.setIsActive(createUniversityRequest.getIsActive());
 
             universityRepository.save(university);
+            log.info("University Saved:{}",university.toString());
             return ResponseEntity.ok(university);
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,6 +151,7 @@ public class InstitutionServiceImpl implements InstitutionService {
             if (universityList != null && !universityList.isEmpty()) {
                 ListOfUniversityResponse listOfUniversityResponse = new ListOfUniversityResponse();
                 listOfUniversityResponse.setUniversities(universityList);
+                log.info("University List :{}",universityList.toString());
                 return ResponseEntity.ok(listOfUniversityResponse);
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"Universities not found", "No universities exist","");
@@ -153,8 +166,10 @@ public class InstitutionServiceImpl implements InstitutionService {
     public ResponseEntity<?> deleteUniversity(Integer universityId) {
         try {
             Optional<University> universityOptional = universityRepository.findById(universityId);
+            log.info("University :{}",universityOptional.toString());
             if (universityOptional.isPresent()) {
                 universityRepository.deleteById(universityId);
+                log.info("University Deleted Successfully");
                 return ResponseEntity.ok("University has been deleted successfully!");
             }else {
                 return  ResponseUtil.createErrorResponse(HttpStatus.NO_CONTENT,"University not found", "Invalid university Id "+universityId,"");
