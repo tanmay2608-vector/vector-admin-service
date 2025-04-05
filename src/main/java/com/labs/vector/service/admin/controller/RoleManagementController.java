@@ -6,6 +6,8 @@ import com.labs.vector.service.admin.service.RoleMasterService;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +21,23 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("http://localhost:3000")
 @RequestMapping("/api/admin/vector-service/v1/role-manager")
 public class RoleManagementController {
+    private static final Logger log = LoggerFactory.getLogger(InstitutionController.class);
 
     @Autowired
     private RoleMasterService roleMasterService;
 
     @GetMapping("/vector-roles")
     public ResponseEntity<?> getAllVectorRoles(){
+        log.info("Fetching all roles");
         return roleMasterService.getAllVectorRoles();
     }
 
     @PreAuthorize("SUPER_ADMIN")
     @PostMapping("/createRole")
     public ResponseEntity<?> createRole(HttpServletRequest request, @Valid @RequestBody CreateRoleRequest createRoleRequest, BindingResult result){
+        log.info("Request to create role recived:{}", createRoleRequest);
         if(result.hasErrors()){
+            log.info("Please correct the input fields as per the validation rules.");
             ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST,
                     "Validation Error",
                     result.getFieldError().getDefaultMessage(),
@@ -44,6 +50,7 @@ public class RoleManagementController {
 
     @PostMapping("/makeInactiveRole/{roleID}")
     public ResponseEntity<?> makeInactiveRole(@PathVariable("roleID") Integer roleID){
+        log.info("Request recived to make role inactive:{}",roleID);
         return roleMasterService.makeInactiveRole(roleID);
     }
 

@@ -6,6 +6,8 @@ import com.labs.vector.service.admin.utils.ResponseUtil;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/vector-service/v1/region-setup")
 @Tag(name = "Region Setup", description = "Region Setup Controller")
 public class RegionSetupController {
+    private static final Logger log = LoggerFactory.getLogger(InstitutionController.class);
 
     @Autowired
     RegionSetupService regionSetupService;
@@ -23,7 +26,9 @@ public class RegionSetupController {
     /*------------------------------------------   Create And Update Region  --------------------------------------------*/
     @PostMapping("/createUpdateRegion")
     public ResponseEntity<?> createUpdateRegion(@Valid @RequestBody CreateRegionRequest createRegionRequest, BindingResult result){
+        log.info("Create or Update region request :{}", createRegionRequest);
         if(result.hasErrors()){
+            log.info("Please correct the input fields as per the validations rules.");
             ResponseUtil.createErrorResponse(
                     HttpStatus.BAD_REQUEST,
                     "Validation Error",
@@ -37,12 +42,14 @@ public class RegionSetupController {
     /*------------------------------------------   Load Region By City ID  --------------------------------------------*/
     @GetMapping("/getRegions/{cityID}")
     public ResponseEntity<?> getRegionsByCityID(@PathVariable Integer cityID){
+        log.info("Fetch all regions with Id:{}",cityID);
         return regionSetupService.getAllRegionByCityID(cityID);
     }
 
     /*------------------------------------------  Delete Region  --------------------------------------------*/
     @DeleteMapping("/deleteRegion/{regionID}")
     public ResponseEntity<?> deleteRegion(@PathVariable Integer regionID){
+        log.info("Request to delete region with Id :{}",regionID);
         return regionSetupService.deleteRegion(regionID);
     }
 

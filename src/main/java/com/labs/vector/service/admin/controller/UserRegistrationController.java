@@ -9,6 +9,8 @@ import com.labs.vector.service.admin.utils.JWTUtil;
 import com.labs.vector.service.admin.utils.ResponseUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/vector-service/v1/registration")
 public class UserRegistrationController {
+    private static final Logger log = LoggerFactory.getLogger(UserRegistrationController.class);
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -34,7 +38,9 @@ public class UserRegistrationController {
 
     @PostMapping("/createUser")
     public ResponseEntity<?> createUser(@Valid  @RequestBody CreateUserRequest createUserRequest, BindingResult result){
+        log.info("Received createUser request :{}",createUserRequest);
         if(result.hasErrors()){
+            log.info("Please correct the input fields as per the validation rules.");
             ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST,
                     "Validation Error",
                     result.getFieldError().getDefaultMessage(),
@@ -48,8 +54,9 @@ public class UserRegistrationController {
     @PostMapping("/vector-user-login")
     public ResponseEntity<?> vectorUserLogin(@Valid @RequestBody VectorRegisteredUser vectorRegisteredUser, BindingResult result){
         try {
-
+            log.info("Request for user login recived:{}",vectorRegisteredUser);
             if(result.hasErrors()){
+                log.info("Please correct the input fields as per the validation rules.");
                 ResponseUtil.createErrorResponse(HttpStatus.BAD_REQUEST,
                         "Validation Error",
                         result.getFieldError().getDefaultMessage(),
@@ -79,16 +86,19 @@ public class UserRegistrationController {
     @GetMapping("getAllVectorRegisterdUser")
     public ResponseEntity<?> getRegisteredVectorUsers(HttpServletRequest request){
         String userId = (String) request.getAttribute("userId");
+        log.info("Fetching all vector registerd user with Id :{}",userId);
         return registrationService.getRegisteredVectorUsers(Integer.parseInt(userId));
     }
 
     @GetMapping("/getVectorAdminUserByID")
     public ResponseEntity<?> getVectorAdminUserByID(@RequestParam("vectorAdminUserID") Integer vectorAdminUserID){
+        log.info("Fetching admin user with Id :{}",vectorAdminUserID);
         return registrationService.getVectorAdminUserByID(vectorAdminUserID);
     }
 
     @GetMapping("/getVectorUserByID")
     public ResponseEntity<?> getVectorUserByID(@RequestParam("getVectorUserByID") Integer getVectorUserByID){
+        log.info("Fetching user with Id:{}", getVectorUserByID);
         return registrationService.getVectorUserByID(getVectorUserByID);
     }
 }
